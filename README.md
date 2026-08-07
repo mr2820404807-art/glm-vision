@@ -17,7 +17,16 @@ description: 为不支持多模态的 AI 模型新增视觉能力：识别/描�
 
 ## 使用方法
 
-### 安装
+### 快速开始（小白版）
+
+1. **下载** 本仓库的 `SKILL.md` 和 `scripts/` 文件夹，发给你的 AI（聊天软件/终端工具均可）
+2. **告诉 AI 安装**：例如"安装这个 skill"
+3. 打开 [智谱开放平台](https://open.bigmodel.cn)，注册后**创建一个 API Key**
+4. 把 API Key **发给 AI**，它会自动帮你配置好
+
+之后直接发图片给它就能"看图"了。
+
+### 手动安装（进阶）
 
 ```bash
 git clone https://github.com/mr2820404807-art/glm-vision.git
