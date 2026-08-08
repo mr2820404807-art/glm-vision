@@ -1,6 +1,6 @@
 ---
 name: glm-vision
-description: 为不支持多模态的 AI 模型新增视觉能力。只要用户发送图片、粘贴图片路径或图片 URL（即使没有附带任何文字说明），AI 必须立即通过本技能识别图片内容、提取图中文字或回答关于图片的问题。底层由智谱 GLM 视觉模型（glm-4v-flash）驱动。
+description: 为不支持多模态的 AI 模型新增视觉能力。只要用户发送图片、粘贴图片路径或图片 URL（即使没有附带任何文字说明），AI 必须立即通过本技能识别图片内容、提取图中文字或回答关于图片的问题。底层由智谱 GLM 视觉模型（glm-4.1v-thinking-flash）驱动。
 ---
 
 # GLM Vision — 图片识别 / OCR / 视觉问答
@@ -76,7 +76,7 @@ python vision.py ask <图片路径或URL> <问题>
 |------|--------|------|
 | `ZHIPU_API_KEY` | （必填） | 智谱 API 密钥 |
 | `ZHIPU_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` | API 地址（兼容 OpenAI 格式） |
-| `GLM_VISION_MODEL` | `glm-4v-flash` | 视觉模型名称 |
+| `GLM_VISION_MODEL` | `glm-4.1v-thinking-flash` | 视觉模型名称 |
 
 ## 项目结构
 
@@ -104,7 +104,7 @@ python vision.py ask <图片路径或URL> <问题>
 
 ## 注意事项
 
-- 免费模型 `glm-4v-flash` 有访问限流，脚本已内置自动重试（429 时最多重试 5 次、指数退避最长约 2.5 分钟），`max_tokens` 上限 1024
+- 免费模型 `glm-4.1v-thinking-flash` 有访问限流，脚本已内置自动重试（429 时最多重试 5 次、指数退避最长约 2.5 分钟），`max_tokens` 上限 2048
 - 大图自动压缩：超过 5MB 的本地图片会先用 PIL 缩放到最长边 1600px（质量 85）再上传，原图无需手动处理（依赖 pillow，安装时需一并装上）
 - 大图（>15MB）建议先压缩或改用 URL
 - OCR 对清晰印刷体/屏幕截图效果好；手写体可能不完美

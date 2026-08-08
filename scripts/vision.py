@@ -13,7 +13,7 @@ Usage:
 Env:
   ZHIPU_API_KEY  (required)
   ZHIPU_BASE_URL (optional, default https://open.bigmodel.cn/api/paas/v4)
-  GLM_VISION_MODEL (optional, default glm-4v-flash)
+  GLM_VISION_MODEL (optional, default glm-4.1v-thinking-flash)
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ from urllib.parse import urlparse
 import httpx
 
 DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4"
-DEFAULT_MODEL = "glm-4v-flash"
+DEFAULT_MODEL = "glm-4.1v-thinking-flash"
 MAX_IMAGE_BYTES = 15 * 1024 * 1024
 RETRY_MAX = 5
 RETRY_BASE_DELAY = 5.0
@@ -132,7 +132,15 @@ def build_vision_message(prompt: str, image_input: str, detail: bool = True) -> 
     return {"role": "user", "content": content}
 
 
-def call_glm(messages: list[dict], max_tokens: int = 1024) -> str:
+def clean_answer(text: str) -> str:
+    """Strip <think> reasoning blocks; keep only the final answer."""
+    m = re.search(r"<answer>(.*?)</answer>", text, re.S)
+    if m:
+        return m.group(1).strip()
+    return text
+
+
+def call_glm(messages: list[dict], max_tokens: int = 2048) -> str:
     key = cfg("ZHIPU_API_KEY")
     if not key:
         raise RuntimeError(
@@ -178,7 +186,8 @@ def call_glm(messages: list[dict], max_tokens: int = 1024) -> str:
 
     data = resp.json()
     try:
-        return data["choices"][0]["message"]["content"]
+        content = data["choices"][0]["message"]["content"]
+        return clean_answer(content)
     except (KeyError, IndexError, TypeError) as exc:
         raise RuntimeError(
             f"Unexpected GLM response: {json.dumps(data, ensure_ascii=False)[:500]}"
