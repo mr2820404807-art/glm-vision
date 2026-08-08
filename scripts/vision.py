@@ -65,6 +65,34 @@ def looks_like_base64(s: str) -> bool:
     return bool(re.fullmatch(r"[A-Za-z0-9+/=]+", s)) and len(s) % 4 == 0
 
 
+def auto_compress(raw: bytes, mime: str, max_bytes: int = 5 * 1024 * 1024, max_side: int = 1600) -> tuple[bytes, str]:
+    """Compress oversized images so the vision API accepts them."""
+    if len(raw) <= max_bytes:
+        return raw, mime
+    try:
+        from io import BytesIO
+        from PIL import Image
+    except ImportError:
+        return raw, mime
+    try:
+        img = Image.open(BytesIO(raw))
+        img.load()
+        if max(img.size) > max_side:
+            img.thumbnail((max_side, max_side))
+        if img.mode not in ("RGB", "L"):
+            img = img.convert("RGB")
+        out = BytesIO()
+        img.save(out, format="JPEG", quality=85)
+        compressed = out.getvalue()
+        if len(compressed) >= len(raw):
+            return raw, mime
+        print(f"[compress] {len(raw)} -> {len(compressed)} bytes (mime {mime} -> image/jpeg)", file=sys.stderr)
+        return compressed, "image/jpeg"
+    except Exception as exc:  # noqa: BLE001
+        print(f"[compress] skipped: {exc}", file=sys.stderr)
+        return raw, mime
+
+
 def build_vision_message(prompt: str, image_input: str, detail: bool = True) -> dict:
     content: list[dict] = []
 
@@ -94,6 +122,7 @@ def build_vision_message(prompt: str, image_input: str, detail: bool = True) -> 
                 f"image too large ({len(raw)} bytes > {MAX_IMAGE_BYTES}); "
                 "resize/compress it or use an http(s) URL instead"
             )
+        raw, mime = auto_compress(raw, mime)
         content.append({
             "type": "image_url",
             "image_url": {"url": f"data:{mime};base64,{base64.b64encode(raw).decode()}", "detail": "high" if detail else "low"},

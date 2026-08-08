@@ -25,7 +25,7 @@ python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" ocr
 python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" ask <图片路径或URL> <问题>
 ```
 
-脚本需要环境变量 `ZHIPU_API_KEY`。依赖 `httpx`（`pip install httpx`）。
+脚本需要环境变量 `ZHIPU_API_KEY`（智谱开放平台免费申请）。依赖 `httpx`（`pip install httpx`）；大图自动压缩需 `pillow`（`pip install pillow`，未安装时跳过压缩直接上传）。
 
 ## 触发场景
 
@@ -38,7 +38,8 @@ python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" ask
 ## 注意事项
 
 - 免费模型 `glm-4v-flash` 有访问限流（429 会自动重试，最多 5 次、最长约 2.5 分钟），`max_tokens` 上限 1024
-- 大图（>15MB）建议先压缩或改用 URL
+- 大图自动压缩：超过 5MB 的本地图片会先用 PIL 缩放到最长边 1600px（质量 85）再上传，原图无需手动处理（需 `pip install pillow`）
+- 大图（>15MB）建议先压缩或改用 URL（5MB~15MB 会自动压缩）
 - OCR 对清晰印刷体/屏幕截图效果好；手写体可能不完美
 - 图片 URL 需可公开访问（模型服务端拉取）
 - 本模型本身不支持图片输入，拿到图片路径/URL 后必须通过本脚本转成文字，再把结果回复给用户
