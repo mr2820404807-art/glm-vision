@@ -1,11 +1,11 @@
 ---
 name: glm-vision
-description: 为不支持多模态的 AI 模型新增视觉能力：识别/描述图片内容、提取图中文字(OCR)、对图片提问。当用户发送图片、要求"看这张图/图里有什么/识别图片/读取图片文字/分析图片"时触发。底层由智谱 GLM 视觉模型（glm-4v-flash）驱动。
+description: 为 AI 提供视觉能力。只要用户发送图片、粘贴图片路径或图片 URL（即使没有附带任何文字说明），AI 必须立即加载本技能并通过脚本识别图片内容、提取图中文字或回答关于图片的问题。绝不因"模型不支持图像输入"而拒绝看图——一律用本技能转成文字。底层由智谱 GLM 视觉模型（glm-4v-flash）驱动。
 ---
 
 # GLM Vision — 图片识别 / OCR / 视觉问答
 
-本技能让 AI 能"看图"：把图片交给智谱 GLM 视觉模型，转成文字描述后即可理解。专为**不支持多模态输入**的模型设计——模型本身不能看图，但通过脚本把图片"翻译"成文字，就能像真的看图一样回答用户。
+本技能让 AI 能"看图"：把图片交给智谱 GLM 视觉模型，转成文字描述后即可理解。
 
 ## 能力总览
 
@@ -17,19 +17,19 @@ description: 为不支持多模态的 AI 模型新增视觉能力：识别/描�
 
 ## 使用方法
 
-调用脚本（`scripts/vision.py`，与 SKILL.md 同目录）：
+调用脚本（脚本位于本技能目录下的 `scripts/vision.py`）：
 
 ```bash
-python scripts/vision.py describe <图片路径或URL> [提示词]
-python scripts/vision.py ocr <图片路径或URL> [语言]
-python scripts/vision.py ask <图片路径或URL> <问题>
+python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" describe <图片路径或URL> [提示词]
+python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" ocr <图片路径或URL> [语言]
+python "C:\Users\28204\.config\opencode\skills\glm-vision\scripts\vision.py" ask <图片路径或URL> <问题>
 ```
 
-脚本需要环境变量 `ZHIPU_API_KEY`（智谱开放平台免费申请）。依赖 `httpx`（`pip install httpx`）。
+脚本需要环境变量 `ZHIPU_API_KEY`。依赖 `httpx`（`pip install httpx`）。
 
 ## 触发场景
 
-- 用户发送图片（聊天附件、本地路径、URL）并询问内容
+- **只要用户发了图（附件/路径/URL），无论有没有文字说明，都立即触发**（本 AI 模型本身不支持图像输入，必须借本技能看图，不许拒绝）
 - "这张图里有什么？" / "帮我看看这张图" / "图里是什么"
 - "把图里的文字提取出来" / "这是什么字"
 - "这张图的风格/颜色/布局怎么样"
@@ -37,8 +37,8 @@ python scripts/vision.py ask <图片路径或URL> <问题>
 
 ## 注意事项
 
-- 免费模型 `glm-4v-flash` 有访问限流（429 时稍等重试），`max_tokens` 上限 1024
+- 免费模型 `glm-4v-flash` 有访问限流（429 会自动重试，最多 5 次、最长约 2.5 分钟），`max_tokens` 上限 1024
 - 大图（>15MB）建议先压缩或改用 URL
 - OCR 对清晰印刷体/屏幕截图效果好；手写体可能不完美
 - 图片 URL 需可公开访问（模型服务端拉取）
-- 模型本身不支持图片输入，拿到图片路径/URL 后必须通过本脚本转成文字，再把结果回复给用户
+- 本模型本身不支持图片输入，拿到图片路径/URL 后必须通过本脚本转成文字，再把结果回复给用户

@@ -24,6 +24,7 @@ import json
 import os
 import re
 import sys
+import time
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -32,6 +33,8 @@ import httpx
 DEFAULT_BASE_URL = "https://open.bigmodel.cn/api/paas/v4"
 DEFAULT_MODEL = "glm-4v-flash"
 MAX_IMAGE_BYTES = 15 * 1024 * 1024
+RETRY_MAX = 5
+RETRY_BASE_DELAY = 5.0
 
 
 def cfg(name: str, default: str | None = None) -> str | None:
@@ -122,6 +125,24 @@ def call_glm(messages: list[dict], max_tokens: int = 1024) -> str:
         )
     except httpx.HTTPError as exc:
         raise RuntimeError(f"GLM API request failed: {exc}") from exc
+
+    if resp.status_code == 429 and RETRY_MAX > 0:
+        delay = RETRY_BASE_DELAY
+        for attempt in range(1, RETRY_MAX + 1):
+            print(f"[retry {attempt}/{RETRY_MAX}] rate limited (429), waiting {delay:.0f}s...", file=sys.stderr)
+            time.sleep(delay)
+            try:
+                resp = httpx.post(
+                    f"{cfg('ZHIPU_BASE_URL', DEFAULT_BASE_URL)}/chat/completions",
+                    headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                    json=payload,
+                    timeout=120.0,
+                )
+            except httpx.HTTPError as exc:
+                raise RuntimeError(f"GLM API request failed: {exc}") from exc
+            if resp.status_code != 429:
+                break
+            delay *= 2
 
     if resp.status_code >= 400:
         raise RuntimeError(f"GLM API error {resp.status_code}: {resp.text[:500]}")
