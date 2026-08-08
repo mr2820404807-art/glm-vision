@@ -19,7 +19,7 @@ description: 为不支持多模态的 AI 模型新增视觉能力。只要用户
 
 ### 快速开始（小白版）
 
-1. **下载**：进入右侧 **Releases**，下载 `glm-vision-v1.0.0.zip` 压缩包（或直接下载本仓库的 `SKILL.md` + `scripts/` 文件夹，两个都需要）
+1. **下载**：进入右侧 **Releases**，下载最新版压缩包（如 `glm-vision-v1.0.1.zip`，或直接下载本仓库的 `SKILL.md` + `scripts/` 文件夹，两个都需要）
 2. 解压后把 **`SKILL.md` 和 `scripts/` 文件夹一起发给 AI**，告诉它"安装这个 skill"
 3. 打开 [智谱开放平台](https://open.bigmodel.cn)，注册后**创建一个 API Key**
 4. 把 API Key **发给 AI**，它会自动帮你配置好
@@ -80,7 +80,7 @@ python vision.py ask <图片路径或URL> <问题>
 ├── SKILL.md              # AI 技能定义（触发词 + 使用说明）
 ├── scripts/
 │   └── vision.py         # 核心脚本：图片 → GLM 视觉模型 → 文字
-├── glm-vision-v1.0.0.zip # 发布版打包（SKILL.md + scripts/），见右侧 Releases
+├── glm-vision-v1.0.1.zip # 发布版打包（SKILL.md + scripts/），见右侧 Releases
 └── README.md             # 本文档
 ```
 
