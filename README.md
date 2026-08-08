@@ -19,10 +19,11 @@ description: 为不支持多模态的 AI 模型新增视觉能力。只要用户
 
 ### 快速开始（小白版）
 
-1. **下载**：进入右侧 **Releases**，下载最新版压缩包（如 `glm-vision-v1.0.2.zip`，或直接下载本仓库的 `SKILL.md` + `scripts/` 文件夹，两个都需要）
+1. **下载**：进入右侧 **Releases**，下载最新版压缩包（如 `glm-vision-v1.0.3.zip`，或直接下载本仓库的 `SKILL.md` + `scripts/` 文件夹，两个都需要）
 2. 解压后把 **`SKILL.md` 和 `scripts/` 文件夹一起发给 AI**，告诉它"安装这个 skill"
 3. 打开 [智谱开放平台](https://open.bigmodel.cn)，注册后**创建一个 API Key**
 4. 把 API Key **发给 AI**，它会自动帮你配置好
+5. **安装依赖**：运行 `pip install httpx pillow`（pillow 用于大图自动压缩，必须安装，否则大图无法自动压缩）
 
 之后直接发图片给它就能"看图"了。
 
@@ -80,13 +81,13 @@ python vision.py ask <图片路径或URL> <问题>
 ├── SKILL.md              # AI 技能定义（触发词 + 使用说明）
 ├── scripts/
 │   └── vision.py         # 核心脚本：图片 → GLM 视觉模型 → 文字
-├── glm-vision-v1.0.2.zip # 发布版打包（SKILL.md + scripts/），见右侧 Releases
+├── glm-vision-v1.0.3.zip # 发布版打包（SKILL.md + scripts/），见右侧 Releases
 └── README.md             # 本文档
 ```
 
 ## 技术栈
 
-- Python 3.9+（标准库 + [httpx](https://www.python-httpx.org/) + [pillow](https://python-pillow.org/)（大图自动压缩，可选））
+- Python 3.9+（标准库 + [httpx](https://www.python-httpx.org/) + [pillow](https://python-pillow.org/)（大图自动压缩））
 - [智谱 GLM-4V-Flash](https://open.bigmodel.cn) 免费视觉模型（OpenAI 兼容接口）
 
 ## 工作原理
@@ -100,7 +101,7 @@ python vision.py ask <图片路径或URL> <问题>
 ## 注意事项
 
 - 免费模型 `glm-4v-flash` 有访问限流，脚本已内置自动重试（429 时最多重试 5 次、指数退避最长约 2.5 分钟），`max_tokens` 上限 1024
-- 大图自动压缩：超过 5MB 的本地图片会先用 PIL 缩放到最长边 1600px（质量 85）再上传，原图无需手动处理（需安装 pillow）
+- 大图自动压缩：超过 5MB 的本地图片会先用 PIL 缩放到最长边 1600px（质量 85）再上传，原图无需手动处理（依赖 pillow，安装时需一并装上）
 - 大图（>15MB）建议先压缩或改用 URL
 - OCR 对清晰印刷体/屏幕截图效果好；手写体可能不完美
 - 图片 URL 需可公开访问（模型服务端拉取）
